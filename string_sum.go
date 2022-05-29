@@ -29,33 +29,33 @@ func StringSum(input string) (output string, err error) {
 	isDoubleNegative := false
 	firstNumbIndex := 0
 	secondNumbIndex := 1
+	emptyInput := fmt.Errorf("input is empty %w", errorEmptyInput)
+	wrongOperandCount := fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
 	err = nil
 	var splitted []string
 	if strings.TrimSpace(input) == "" {
-		return "", fmt.Errorf("input is empty %w", errorEmptyInput)
+		return "", emptyInput
 	} else if len(strings.TrimSpace(input)) <= 1 {
-		return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
-	} else if len(strings.TrimSpace(input)) > 4 {
-		return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+		return "", wrongOperandCount
 	}
 	if strings.Contains(input, "+") {
 		splitted = strings.Split(input, "+")
 		if len(splitted) != 2 {
-			return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+			return "", wrongOperandCount
 		}
 	} else if strings.Count(input, "-") >= 2 {
 		splitted = strings.Split(input, "-")
-		if splitted[0] == "" {
+		if strings.TrimSpace(splitted[0]) == "" {
 			splitted = splitted[1:]
 		}
 		if len(splitted) != 2 {
-			return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+			return "", wrongOperandCount
 		}
 		isDoubleNegative = true
 	} else if strings.Count(input, "-") == 1 {
 		splitted = strings.Split(strings.ReplaceAll(input, "-", "+"), "+")
 		if len(splitted) != 2 {
-			return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+			return "", wrongOperandCount
 		}
 		firstNumber, err1 := strconv.Atoi(strings.TrimSpace(splitted[firstNumbIndex]))
 		if err1 != nil {
@@ -67,6 +67,8 @@ func StringSum(input string) (output string, err error) {
 		}
 		output = strconv.Itoa(firstNumber - secondNumber)
 		return
+	} else {
+		return "", wrongOperandCount
 	}
 
 	firstNumber, err1 := strconv.Atoi(strings.TrimSpace(splitted[firstNumbIndex]))
