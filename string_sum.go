@@ -2,6 +2,9 @@ package string_sum
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 //use these errors as appropriate, wrapping them with fmt.Errorf function
@@ -23,5 +26,62 @@ var (
 // Use the errors defined above as described, again wrapping into fmt.Errorf
 
 func StringSum(input string) (output string, err error) {
-	return "", nil
+	isDoubleNegative := false
+	firstNumbIndex := 0
+	secondNumbIndex := 1
+	err = nil
+	var splitted []string
+	if strings.TrimSpace(input) == "" {
+		return "", fmt.Errorf("input is empty %w", errorEmptyInput)
+	} else if len(strings.TrimSpace(input)) <= 1 {
+		return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+	} else if len(strings.TrimSpace(input)) > 4 {
+		return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+	}
+	if strings.Contains(input, "+") {
+		splitted = strings.Split(input, "+")
+		if len(splitted) != 2 {
+			return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+		}
+	} else if strings.Count(input, "-") >= 2 {
+		splitted = strings.Split(input, "-")
+		if splitted[0] == "" {
+			splitted = splitted[1:]
+		}
+		if len(splitted) != 2 {
+			return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+		}
+		isDoubleNegative = true
+	} else if strings.Count(input, "-") == 1 {
+		splitted = strings.Split(strings.ReplaceAll(input, "-", "+"), "+")
+		if len(splitted) != 2 {
+			return "", fmt.Errorf("expecting two operands, but received more or less %w", errorNotTwoOperands)
+		}
+		firstNumber, err1 := strconv.Atoi(strings.TrimSpace(splitted[firstNumbIndex]))
+		if err1 != nil {
+			return "", fmt.Errorf("bad token. %w", err1)
+		}
+		secondNumber, err2 := strconv.Atoi(strings.TrimSpace(splitted[secondNumbIndex]))
+		if err2 != nil {
+			return "", fmt.Errorf("bad token. %w", err2)
+		}
+		output = strconv.Itoa(firstNumber - secondNumber)
+		return
+	}
+
+	firstNumber, err1 := strconv.Atoi(strings.TrimSpace(splitted[firstNumbIndex]))
+	if err1 != nil {
+		return "", fmt.Errorf("bad token. %w", err1)
+	}
+	secondNumber, err2 := strconv.Atoi(strings.TrimSpace(splitted[secondNumbIndex]))
+	if err2 != nil {
+		return "", fmt.Errorf("bad token. %w", err2)
+	}
+	sum := firstNumber + secondNumber
+	if isDoubleNegative {
+		output = strconv.Itoa(-sum)
+	} else {
+		output = strconv.Itoa(sum)
+	}
+	return
 }
